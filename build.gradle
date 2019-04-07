@@ -1,0 +1,52 @@
+def groovyVersion = '2.5.6'
+def junitVersion = '4.11'
+def assertJVersion = '3.8.0'
+def jenkinsPipelineUnitVersion = '1.1'
+
+apply plugin: 'groovy'
+apply plugin: 'jacoco'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compileOnly "org.codehaus.groovy:groovy-all:${groovyVersion}"
+    testCompile "junit:junit:${junitVersion}"
+    testCompile "org.assertj:assertj-core:${assertJVersion}"
+    testCompile "com.lesfurets:jenkins-pipeline-unit:${jenkinsPipelineUnitVersion}"
+}
+
+
+jacoco {
+    toolVersion = "0.8.3"
+}
+
+
+task initLibraries(type: Copy) {
+    from('./') {
+        include 'src/**/*'
+        include 'vars/**/*'
+    }
+    into 'build/classes/groovy/test/library/sharedLib@master'
+}
+
+test.dependsOn initLibraries
+
+test {
+    ignoreFailures = true
+}
+
+sourceSets {
+    main {
+        groovy {
+            srcDir 'src'
+        }
+    }
+    test {
+        groovy {
+            srcDir 'test'
+        }
+    }
+}
+
